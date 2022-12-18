@@ -54,6 +54,7 @@ public class PlayerListener implements Listener {
 
     @OnPostEnable
     public void registerListener() {
+        if(SBA.isBroken())return;
         SBA.getInstance().registerListener(this);
         allowedDropItems.clear();
         generatorDropItems.clear();
@@ -154,12 +155,12 @@ public class PlayerListener implements Listener {
                         this.cancel();
                         return;
                     }
-                    final net.kyori.adventure.text.Component respawnTitle = LanguageService
+                    final org.screamingsandals.lib.spectator.Component respawnTitle = LanguageService
                             .getInstance()
                             .get(MessageKeys.RESPAWN_COUNTDOWN_TITLE)
                             .replace("%time%", String.valueOf(livingTime))
                             .toComponent();
-                    final net.kyori.adventure.text.Component respawnSubtitle = LanguageService
+                    final org.screamingsandals.lib.spectator.Component respawnSubtitle = LanguageService
                             .getInstance()
                             .get(MessageKeys.RESPAWN_COUNTDOWN_SUBTITLE)
                             .replace("%time%", String.valueOf(livingTime))
@@ -178,7 +179,7 @@ public class PlayerListener implements Listener {
                         livingTime--;
                     }
 
-                    if (livingTime == 0) {
+                    if (livingTime <= 0) {
                         if (gVictim.isSpectator && buffer > 0) {
                             buffer--;
                         } else {
@@ -192,7 +193,7 @@ public class PlayerListener implements Listener {
                                     .get(MessageKeys.RESPAWNED_TITLE)
                                     .toComponent();
 
-                            SBAUtil.sendTitle(wrappedPlayer, respawnedTitle, net.kyori.adventure.text.Component.empty(),
+                            SBAUtil.sendTitle(wrappedPlayer, respawnedTitle, org.screamingsandals.lib.spectator.Component.empty(),
                                     5, 40, 5);
                             ShopUtil.giveItemToPlayer(itemArr, player,
                                     Main.getInstance().getGameByName(game.getName()).getTeamOfPlayer(player)

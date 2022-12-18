@@ -67,6 +67,7 @@ public abstract class AbstractStoreInventory implements IStoreInventory, Listene
 
     @OnPostEnable
     public void onPostEnable() {
+        if(SBA.isBroken())return;
         if (shopPaths.length() > 0)
             Arrays.stream(shopPaths.split(","))
                     .forEach(path -> {
@@ -206,7 +207,7 @@ public abstract class AbstractStoreInventory implements IStoreInventory, Listene
             userInQuickBuy.put(player.getUniqueId(), quickBuyId);
             return;
         }
-        if (userInQuickBuy.containsKey(player.getUniqueId())) {
+        if (!isQuickBuy && userInQuickBuy.containsKey(player.getUniqueId())) {
             Logger.trace("Setting up quick item as{} {}", price, newItem.getType());
             var quickBuyId = userInQuickBuy.get(player.getUniqueId());
             QuickBuyConfig.getInstance().of(player).set(quickBuyId,

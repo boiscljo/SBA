@@ -7,7 +7,7 @@ import io.github.pronze.sba.Permissions;
 import io.github.pronze.sba.SBA;
 import io.github.pronze.sba.lib.lang.LanguageService;
 import io.github.pronze.sba.wrapper.SBAPlayerWrapper;
-import net.kyori.adventure.text.Component;
+import org.screamingsandals.lib.spectator.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +26,7 @@ public class ShoutCommand {
     static boolean init = false;
     @OnPostEnable
     public void onPostEnabled() {
+        if(SBA.isBroken())return;
         if (init)
             return;
         CommandManager.getInstance().getAnnotationParser().parse(this);

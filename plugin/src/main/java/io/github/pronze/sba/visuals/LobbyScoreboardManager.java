@@ -5,7 +5,6 @@ import io.github.pronze.sba.lib.lang.LanguageService;
 import io.github.pronze.sba.utils.DateUtils;
 import io.github.pronze.sba.utils.Logger;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -43,6 +42,7 @@ public class LobbyScoreboardManager implements Listener {
 
     @OnPostEnable
     public void registerListener() {
+        if(SBA.isBroken())return;
         if (!(enabled = SBAConfig.getInstance().node("lobby-scoreboard", "enabled").getBoolean(true))) {
             return;
         }

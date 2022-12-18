@@ -18,6 +18,7 @@ import io.github.pronze.sba.commands.party.PartyCommand;
 import lombok.Getter;
 import lombok.NonNull;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -51,6 +52,7 @@ public class CommandManager {
     private @NotNull BukkitAudiences bukkitAudiences;
 
     public static void reload() {
+        if(SBA.isBroken())return;
         CommandManager ths = getInstance();
         if(ths!=null)
         {
@@ -63,8 +65,10 @@ public class CommandManager {
     }
     @OnEnable
     public void onEnable(JavaPlugin plugin) {
+        if(SBA.isBroken())return;
         if (manager != null)
             return;
+        if(SBA.isBroken())return;
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction = CommandExecutionCoordinator
                 .simpleCoordinator();
         final Function<CommandSender, CommandSender> mapperFunction = Function.identity();

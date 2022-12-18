@@ -9,6 +9,8 @@ import io.github.pronze.sba.fix.BungeecordNPC;
 import io.github.pronze.sba.fix.MagmaFix;
 import io.github.pronze.sba.fix.MohistFix;
 import io.github.pronze.sba.fix.PerWorldPluginFix;
+import io.github.pronze.sba.fix.ViaVersionFix;
+import io.github.pronze.sba.fix.v1_19_3_fix;
 import io.github.pronze.sba.game.ArenaManager;
 import io.github.pronze.sba.game.IGameStorage;
 import io.github.pronze.sba.game.tasks.GameTaskManager;
@@ -79,7 +81,7 @@ import static io.github.pronze.sba.utils.MessageUtils.showErrorMessage;
         "boiscljo" }, loadTime = Plugin.LoadTime.POSTWORLD, version = VersionInfo.VERSION)
 @PluginDependencies(platform = PlatformType.BUKKIT, dependencies = {
         "BedWars"
-}, softDependencies = { "PlaceholderAPI", "ViaVersion", "Citizens", "Vulcan" ,"PerWorldPlugins"})
+}, softDependencies = { "PlaceholderAPI", "ViaVersion", "Citizens", "Vulcan", "PerWorldPlugins" })
 @Init(services = {
         Logger.class,
         PacketMapper.class,
@@ -159,11 +161,15 @@ public class SBA extends PluginContainer implements AddonAPI {
         fixs = new ArrayList<>();
         fixs.add(BungeecordNPC.getInstance());
         fixs.add(new MohistFix());
+        fixs.add(new v1_19_3_fix());
+        fixs.add(new ViaVersionFix());
         fixs.add(new MagmaFix());
         fixs.add(new PerWorldPluginFix());
 
         for (BaseFix fix : fixs) {
             fix.detect();
+            if (fix.IsCritical())
+                broken = true;
         }
 
         ScoreboardManager.init(cachedPluginInstance);
@@ -189,7 +195,8 @@ public class SBA extends PluginContainer implements AddonAPI {
             }
             if (!List.of("0.2.20", "0.2.21", "0.2.22", "0.2.23", "0.2.24", "0.2.25", "0.2.26").stream()
                     .anyMatch(BedwarsAPI.getInstance().getPluginVersion()::equals)) {
-                Logger.warn("SBA hasn't been tested on this version of Bedwars. If you encounter bugs, use version 0.2.20 to 0.2.26. ");
+                Logger.warn(
+                        "SBA hasn't been tested on this version of Bedwars. If you encounter bugs, use version 0.2.20 to 0.2.26. ");
             }
         }
         for (BaseFix fix : fixs) {
@@ -197,15 +204,17 @@ public class SBA extends PluginContainer implements AddonAPI {
             if (fix.IsProblematic())
                 fix.warn();
             if (fix.IsCritical()) {
+                broken = true;
                 Bukkit.getServer().getPluginManager().disablePlugin(getPluginInstance());
-                return;
             }
         }
-        InventoryListener.init(cachedPluginInstance);
+        if (!broken) {
+            InventoryListener.init(cachedPluginInstance);
 
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            Logger.trace("Registering SBAExpansion...");
-            new SBAExpansion().register();
+            if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+                Logger.trace("Registering SBAExpansion...");
+                new SBAExpansion().register();
+            }
         }
 
         Logger.info("Plugin has finished loading!");
@@ -215,10 +224,11 @@ public class SBA extends PluginContainer implements AddonAPI {
         Logger.trace("API has been registered!");
 
         Logger.setMode(Level.WARNING);
-
-        if (getPluginInstance().getServer().getPluginManager().getPlugin("Citizens") != null
-                && getPluginInstance().getServer().getPluginManager().getPlugin("Citizens").isEnabled()) {
-            CitizensTraits.enableCitizensTraits();
+        if (!broken) {
+            if (getPluginInstance().getServer().getPluginManager().getPlugin("Citizens") != null
+                    && getPluginInstance().getServer().getPluginManager().getPlugin("Citizens").isEnabled()) {
+                CitizensTraits.enableCitizensTraits();
+            }
         }
     }
 
@@ -352,5 +362,11 @@ public class SBA extends PluginContainer implements AddonAPI {
 
     public void update(@NotNull CommandSender sender) {
         UpdateChecker.getInstance().update(sender);
+    }
+
+    private static boolean broken = false;
+
+    public static boolean isBroken() {
+        return broken;
     }
 }

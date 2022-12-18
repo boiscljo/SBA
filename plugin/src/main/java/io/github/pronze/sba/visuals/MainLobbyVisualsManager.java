@@ -4,7 +4,7 @@ import io.github.pronze.sba.MessageKeys;
 import io.github.pronze.sba.lib.lang.LanguageService;
 import io.github.pronze.sba.utils.Logger;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.text.Component;
+import org.screamingsandals.lib.spectator.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -47,6 +47,7 @@ public class MainLobbyVisualsManager implements Listener {
 
     @OnPostEnable
     public void registerListener() {
+        if(SBA.isBroken())return;
         SBA.getInstance().registerListener(this);
 
         load();
@@ -91,12 +92,14 @@ public class MainLobbyVisualsManager implements Listener {
             return;
         if (!SBAConfig.getInstance().node("main-lobby", "custom-chat").getBoolean(true))
             return;
+
         final var player = e.getPlayer();
         final var db = SBA.getInstance().getPlayerWrapperService().get(player).orElseThrow();
 
         if (SBAConfig.getInstance().node("main-lobby", "enabled").getBoolean(false)
                 && MainLobbyVisualsManager.isInWorld(e.getPlayer().getLocation())) {
-
+            if (Main.isPlayerInGame(player))
+                return;
             var chatFormat = LanguageService
                     .getInstance()
                     .get(MessageKeys.MAIN_LOBBY_CHAT_FORMAT)
@@ -193,8 +196,7 @@ public class MainLobbyVisualsManager implements Listener {
                     .get(MessageKeys.MAIN_LOBBY_TABLIST_FOOTER)
                     .replace("%sba_version%", SBA.getInstance().getVersion())
                     .toComponent();
-
-            playerData.sendPlayerListHeaderAndFooter(header, footer);
+            playerData.sendPlayerListHeaderFooter(header, footer);
         }
 
         var title = LanguageService
@@ -249,7 +251,7 @@ public class MainLobbyVisualsManager implements Listener {
             player.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
         }
         if (SBAConfig.getInstance().node("main-lobby", "tablist-modifications").getBoolean()) {
-            PlayerMapper.wrapPlayer(player).sendPlayerListHeaderAndFooter(Component.empty(), Component.empty());
+            PlayerMapper.wrapPlayer(player).sendPlayerListHeaderFooter(Component.empty(), Component.empty());
         }
     }
 

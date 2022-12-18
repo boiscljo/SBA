@@ -3,13 +3,12 @@ package io.github.pronze.sba.lang;
 import io.github.pronze.sba.AddonAPI;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+
+import org.screamingsandals.lib.spectator.Component;
 
 import org.bukkit.ChatColor;
 import org.screamingsandals.lib.sender.CommandSenderWrapper;
-import org.screamingsandals.lib.utils.AdventureHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -70,6 +69,10 @@ public class Message {
         workingString = workingString.replaceAll("#([0-9a-fA-F]{6})", "<#$1>");
 
         workingString=ChatColor.stripColor(workingString);
+
+        var mini = MiniMessage.miniMessage().deserialize(workingString);
+        workingString=net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(mini);
+
         return workingString;
     }
     public static Message of(List<String> text) {
@@ -121,7 +124,7 @@ public class Message {
                         .getConfigurator()
                         .getString("prefix", "[SBA]") + ": " + str;
             }
-            component.append(MiniMessage.miniMessage().deserialize(toMiniMessage(str)));
+            component.append(Component.fromLegacy(toMiniMessage(str)));
             if (original.indexOf(str) + 1 != original.size()) {
                 component.append(Component.text("\n"));
             }
@@ -138,13 +141,14 @@ public class Message {
                     .getConfigurator()
                     .getString("prefix", "[SBA]") + ": ";
         }
-        return AdventureHelper.toLegacy(MiniMessage.miniMessage().deserialize(toMiniMessage(string)));
+        return Component.fromLegacy(toMiniMessage(string)).toLegacy();
+//        return AdventureHelper.toLegacy(MiniMessage.miniMessage().deserialize());
     }
 
     public List<String> toStringList() {
         return toComponentList()
                 .stream()
-                .map(AdventureHelper::toLegacy)
+                .map(Component::toLegacy)
                 .collect(Collectors.toList());
     }
 
@@ -160,7 +164,7 @@ public class Message {
                     }
                     return toMiniMessage(str);
                 })
-                .map(MiniMessage.miniMessage()::deserialize)
+                .map(Component::fromLegacy)
                 .collect(Collectors.toList());
     }
 
