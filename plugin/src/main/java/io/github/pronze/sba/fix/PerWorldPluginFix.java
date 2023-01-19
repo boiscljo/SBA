@@ -1,24 +1,29 @@
 package io.github.pronze.sba.fix;
 
-import org.bukkit.Bukkit;
-import org.screamingsandals.bedwars.Main;
-import org.screamingsandals.lib.utils.reflect.Reflect;
-
 import io.github.pronze.sba.config.SBAConfig;
 import io.github.pronze.sba.utils.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
+import org.screamingsandals.bedwars.Main;
 
 public class PerWorldPluginFix extends BaseFix {
 
     private boolean isProblematic;
     @Override
     public void detect() {
-        isProblematic= Bukkit.getPluginManager().isPluginEnabled("PerWorldPlugins");
+        Plugin plugin = Bukkit.getPluginManager().getPlugin("PerWorldPlugins");
+
+        if (plugin != null) {
+            isProblematic = !plugin.getDescription().getAuthors().contains("TonimatasDEV");
+        } else {
+            isProblematic = false;
+        }
     }
 
     @Override
     public void fix(SBAConfig cfg) {
-        if(isProblematic)
-        {
+        if (isProblematic) {
             Bukkit.getServer().getPluginManager().disablePlugin(Main.getInstance());
         }
     }
