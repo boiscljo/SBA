@@ -37,14 +37,13 @@ import org.bukkit.event.player.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.screamingsandals.bedwars.Main;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.game.GamePlayer;
-import org.screamingsandals.lib.player.PlayerMapper;
+import org.screamingsandals.lib.player.Players;
 import org.screamingsandals.lib.utils.annotations.Service;
 import org.screamingsandals.lib.utils.annotations.methods.OnPostEnable;
 import org.screamingsandals.lib.utils.reflect.Reflect;
@@ -156,7 +155,7 @@ public class PlayerListener implements Listener {
                 final GamePlayer gamePlayer = gVictim;
                 final Player player = gamePlayer.player;
 
-                final SBAPlayerWrapper wrappedPlayer = PlayerMapper.wrapPlayer(player).as(SBAPlayerWrapper.class);
+                final SBAPlayerWrapper wrappedPlayer = Players.wrapPlayer(player).as(SBAPlayerWrapper.class);
                 int livingTime = Main.getInstance().getConfig().getInt("respawn-cooldown.time", 5);
                 byte buffer = 2;
 
@@ -253,7 +252,7 @@ public class PlayerListener implements Listener {
                 LanguageService
                         .getInstance()
                         .get(MessageKeys.CANNOT_PUT_ITEM_IN_CHEST)
-                        .send(PlayerMapper.wrapPlayer(player));
+                        .send(Players.wrapPlayer(player));
             }
         }
     }
@@ -296,7 +295,7 @@ public class PlayerListener implements Listener {
                 .fromCache(uuid)
                 .ifPresent(Scoreboard::destroy);
 
-        final var wrappedPlayer = PlayerMapper.wrapPlayer(player)
+        final var wrappedPlayer = Players.wrapPlayer(player)
                 .as(SBAPlayerWrapper.class);
         SBA.getInstance()
                 .getPartyManager()
@@ -428,13 +427,16 @@ public class PlayerListener implements Listener {
 
         BlockFace face = event.getBlockFace();
         Location loc = event.getClickedBlock().getRelative(face).getLocation();
-
-        Collection<Entity> players = loc.getNearbyEntitiesByType(Player.class, 1.5, 1.5, 1.5, null);
-        for (Entity playerEntity : players) {
-            Player player = (Player) playerEntity;
-            if (player.getGameMode() != GameMode.SURVIVAL) {
-                player.teleport(player.getLocation().add(0, 1.5, 0), TeleportCause.SPECTATE);
+        try {
+            Collection<Entity> players = loc.getNearbyEntitiesByType(Player.class, 1.5, 1.5, 1.5, null);
+            for (Entity playerEntity : players) {
+                Player player = (Player) playerEntity;
+                if (player.getGameMode() != GameMode.SURVIVAL) {
+                    player.teleport(player.getLocation().add(0, 1.5, 0), TeleportCause.SPECTATE);
+                }
             }
+        } catch (Throwable t) {
+            //Does not work on spigot
         }
     }
 

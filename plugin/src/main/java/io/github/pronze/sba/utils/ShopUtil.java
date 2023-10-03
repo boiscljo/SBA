@@ -12,9 +12,11 @@ import io.github.pronze.sba.lang.Message;
 import io.github.pronze.sba.lib.lang.LanguageService;
 import io.github.pronze.sba.service.PlayerWrapperService;
 import io.github.pronze.sba.wrapper.SBAPlayerWrapper;
+
+import org.screamingsandals.lib.item.meta.EnchantmentType;
+import org.screamingsandals.lib.player.Players;
 import org.screamingsandals.lib.spectator.Component;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -29,9 +31,6 @@ import org.screamingsandals.bedwars.api.TeamColor;
 import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.api.game.ItemSpawnerType;
 import org.screamingsandals.bedwars.api.utils.ColorChanger;
-import org.screamingsandals.lib.item.Item;
-import org.screamingsandals.lib.item.meta.EnchantmentMapping;
-import org.screamingsandals.lib.player.PlayerMapper;
 import org.screamingsandals.simpleinventories.builder.LocalOptionsBuilder;
 import org.screamingsandals.simpleinventories.events.ItemRenderEvent;
 import org.screamingsandals.simpleinventories.inventory.PlayerItemInfo;
@@ -112,7 +111,7 @@ public class ShopUtil {
                             .getInstance()
                             .get(MessageKeys.CANNOT_DOWNGRADE_ITEM)
                             .replace("%item%", "armor")
-                            .send(PlayerMapper.wrapPlayer(player));
+                            .send(Players.wrapPlayer(player));
                     return false;
                 }
             }
@@ -122,7 +121,7 @@ public class ShopUtil {
                         .getInstance()
                         .get(MessageKeys.ALREADY_PURCHASED)
                         .replace("%thing%", "armor")
-                        .send(PlayerMapper.wrapPlayer(player));
+                        .send(Players.wrapPlayer(player));
                 return false;
             }
         }
@@ -184,7 +183,7 @@ public class ShopUtil {
         List<String> ignoredKeys = List.of("sharpness", "knockback", "protection", "efficiency");
         SBAConfig.getInstance().upgrades().enchants().keys().forEach(ench -> {
             Optional<Enchantment> ec = Arrays.stream(Enchantment.values())
-                    .filter(x -> x.getName().equalsIgnoreCase(ench))
+                    .filter(x -> x.getName().equalsIgnoreCase(ench)||EnchantmentType.of(x).location().path().equalsIgnoreCase(ench))
                     .findFirst();
             if (ignoredKeys.contains(ench))
                 return;
@@ -204,7 +203,7 @@ public class ShopUtil {
         return newItem;
     }
 
-    public static Item applyTeamEnchants(Player player, Item newItem, StoreType type, List<Property> list) {
+    public static org.screamingsandals.lib.item.ItemStack applyTeamEnchants(Player player, org.screamingsandals.lib.item.ItemStack newItem, StoreType type, List<Property> list) {
         final var game = Main.getInstance().getGameOfPlayer(player);
         var gameStorage = SBA
                 .getInstance()
@@ -237,7 +236,7 @@ public class ShopUtil {
         List<String> ignoredKeys = List.of("sharpness", "knockback", "protection", "efficiency");
         for (String ench : SBAConfig.getInstance().upgrades().enchants().keys()) {
             Optional<Enchantment> ec = Arrays.stream(Enchantment.values())
-                    .filter(x -> x.getName().equalsIgnoreCase(ench))
+                    .filter(x -> x.getName().equalsIgnoreCase(ench)||EnchantmentType.of(x).location().path().equalsIgnoreCase(ench))
                     .findFirst();
             if (ignoredKeys.contains(ench))
                 continue;
@@ -272,7 +271,7 @@ public class ShopUtil {
                 .anyMatch(x -> newItem.getType().toString().contains(x.toUpperCase()));
     }
 
-    private static boolean canApply(String string, Item newItem) {
+    private static boolean canApply(String string, org.screamingsandals.lib.item.ItemStack newItem) {
         if (SBAConfig.getInstance().upgrades().enchants().of(string) == null) {
             Logger.error("SBA doesn't know how to apply enchant {}, add it in the upgrade-item.enchants.ENCHANT_HERE",
                     string);
@@ -286,7 +285,7 @@ public class ShopUtil {
         return canApply(getName(string), newItem);
     }
 
-    private static boolean canApply(Enchantment string, Item newItem) {
+    private static boolean canApply(Enchantment string, org.screamingsandals.lib.item.ItemStack newItem) {
         return canApply(getName(string), newItem);
     }
 
@@ -302,7 +301,7 @@ public class ShopUtil {
         AtomicReference<String> str = new AtomicReference<>();
         SBAConfig.getInstance().upgrades().enchants().keys().forEach(ench -> {
             Optional<Enchantment> ec = Arrays.stream(Enchantment.values())
-                    .filter(x -> x.getName().equalsIgnoreCase(ench))
+                    .filter(x -> x.getName().equalsIgnoreCase(ench)||EnchantmentType.of(x).location().path().equalsIgnoreCase(ench))
                     .findFirst();
             if (ec.isPresent() && ec.get().equals(ech))
                 str.set(ench);
@@ -417,7 +416,7 @@ public class ShopUtil {
         return map;
     }
 
-    public static Item setLore(Item item, PlayerItemInfo itemInfo, String price, ItemSpawnerType type, Player player) {
+    public static org.screamingsandals.lib.item.ItemStack setLore(org.screamingsandals.lib.item.ItemStack item, PlayerItemInfo itemInfo, String price, ItemSpawnerType type, Player player) {
         var enabled = itemInfo.getFirstPropertyByName("generateLore")
                 .map(property -> property.getPropertyData().getBoolean())
                 .orElseGet(() -> Main.getConfigurator().config.getBoolean("lore.generate-automatically", true));
@@ -499,7 +498,7 @@ public class ShopUtil {
         return item;
     }
 
-    public static Component getNameOrCustomNameOfItem(Item item) {
+    public static Component getNameOrCustomNameOfItem(org.screamingsandals.lib.item.ItemStack item) {
         try {
             if (item.getDisplayName() != null) {
                 return (item.getDisplayName());
@@ -530,7 +529,7 @@ public class ShopUtil {
         }
     }
 
-    public static Item clampOrApplyEnchants(Item item, int level, Enchantment enchantment, StoreType type,
+    public static org.screamingsandals.lib.item.ItemStack clampOrApplyEnchants(org.screamingsandals.lib.item.ItemStack item, int level, Enchantment enchantment, StoreType type,
             int maxLevel) {
         Logger.trace("--- {} ENCHANT IS lvl {}/{}", enchantment, level, maxLevel);
 
@@ -548,7 +547,7 @@ public class ShopUtil {
                 item.getEnchantments().clear();
             }
         } else if (level > 0) {
-            item = item.withEnchantment(EnchantmentMapping.resolve(enchantment).orElseThrow().withLevel(level));
+            item = item.withEnchantment(org.screamingsandals.lib.item.meta.Enchantment.of(enchantment).withLevel(level));
         }
         return item;
     }
@@ -561,7 +560,7 @@ public class ShopUtil {
      * @param item
      * @param event
      */
-    public static Item applyTeamUpgradeEnchantsToItem(Item item, ItemRenderEvent event, StoreType type) {
+    public static org.screamingsandals.lib.item.ItemStack applyTeamUpgradeEnchantsToItem(org.screamingsandals.lib.item.ItemStack item, ItemRenderEvent event, StoreType type) {
         final var player = event.getPlayer().as(Player.class);
         final var game = Main.getInstance().getGameOfPlayer(player);
         if (game == null)

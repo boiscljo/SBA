@@ -12,6 +12,7 @@ import io.github.pronze.sba.fix.MohistFix;
 import io.github.pronze.sba.fix.PerWorldPluginFix;
 import io.github.pronze.sba.fix.ViaVersionFix;
 import io.github.pronze.sba.fix.WoolFix;
+import io.github.pronze.sba.fix.SLib203Fix;
 import io.github.pronze.sba.game.ArenaManager;
 import io.github.pronze.sba.game.IGameStorage;
 import io.github.pronze.sba.game.tasks.GameTaskManager;
@@ -43,13 +44,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.screamingsandals.bedwars.Main;
-import io.github.pronze.sba.VersionInfo;
 import org.screamingsandals.bedwars.api.BedwarsAPI;
 import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.lib.bstats.bukkit.Metrics;
@@ -59,20 +58,17 @@ import org.screamingsandals.lib.healthindicator.HealthIndicatorManager2;
 import org.screamingsandals.lib.hologram.HologramManager;
 import org.screamingsandals.lib.npc.NPCManager;
 import org.screamingsandals.lib.packet.PacketMapper;
-import org.screamingsandals.lib.player.PlayerMapper;
+import org.screamingsandals.lib.player.Players;
 import org.screamingsandals.lib.plugin.PluginContainer;
 import org.screamingsandals.lib.sidebar.SidebarManager;
-import org.screamingsandals.lib.tasker.Tasker;
 import org.screamingsandals.lib.utils.PlatformType;
 import org.screamingsandals.lib.utils.annotations.Init;
 import org.screamingsandals.lib.utils.annotations.Plugin;
 import org.screamingsandals.lib.utils.annotations.PluginDependencies;
-import org.screamingsandals.lib.utils.reflect.Reflect;
 import org.screamingsandals.simpleinventories.SimpleInventoriesCore;
 import io.github.pronze.lib.pronzelib.scoreboards.ScoreboardManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,6 +124,7 @@ import static io.github.pronze.sba.utils.MessageUtils.showErrorMessage;
 public class SBA extends PluginContainer implements AddonAPI {
 
     private static SBA instance;
+    public static boolean sbw_0_2_30;
     private List<BaseFix> fixs;
     public CitizensFix citizensFix ;
 
@@ -156,9 +153,9 @@ public class SBA extends PluginContainer implements AddonAPI {
         Logger.init(cachedPluginInstance);
 
         if (Main.getVersionNumber() < 109) {
-            showErrorMessage("Minecraft server is running versions below 1.9.4, please upgrade!");
-            Bukkit.getServer().getPluginManager().disablePlugin(getPluginInstance());
-            return;
+            //showErrorMessage("Minecraft server is running versions below 1.9.4, please upgrade!");
+            //Bukkit.getServer().getPluginManager().disablePlugin(getPluginInstance());
+            //return;
         }
         fixs = new ArrayList<>();
         fixs.add(BungeecordNPC.getInstance());
@@ -167,6 +164,7 @@ public class SBA extends PluginContainer implements AddonAPI {
         fixs.add(new MagmaFix());
         fixs.add(new PerWorldPluginFix());
         fixs.add(new WoolFix());
+        fixs.add(new SLib203Fix());
         fixs.add(citizensFix=new CitizensFix());
 
         for (BaseFix fix : fixs) {
@@ -196,11 +194,12 @@ public class SBA extends PluginContainer implements AddonAPI {
                 Bukkit.getServer().getPluginManager().disablePlugin(getPluginInstance());
                 return;
             }
-            if (!List.of("0.2.20", "0.2.21", "0.2.22", "0.2.23", "0.2.24", "0.2.25", "0.2.26", "0.2.27", "0.2.27.1", "0.2.28").stream()
+            if (!List.of("0.2.20", "0.2.21", "0.2.22", "0.2.23", "0.2.24", "0.2.25", "0.2.26", "0.2.27", "0.2.27.1", "0.2.28", "0.2.29", "0.2.30").stream()
                     .anyMatch(BedwarsAPI.getInstance().getPluginVersion()::equals)) {
                 Logger.warn(
-                        "SBA hasn't been tested on this version of Bedwars. If you encounter bugs, use version 0.2.20 to 0.2.28. ");
+                        "SBA hasn't been tested on this version of Bedwars. If you encounter bugs, use version 0.2.20 to 0.2.30. ");
             }
+            sbw_0_2_30 = Integer.parseInt(BedwarsAPI.getInstance().getPluginVersion().split("[.-]")[2]) >= 30;
         }
         for (BaseFix fix : fixs) {
             fix.fix(SBAConfig.getInstance());
@@ -224,6 +223,8 @@ public class SBA extends PluginContainer implements AddonAPI {
         Logger.info("SBA Initialized on JAVA {}", System.getProperty("java.version"));
         Logger.info("SBA Commit is on par with {}", VersionInfo.COMMIT);
         Logger.trace("API has been registered!");
+
+        HologramManager.setPreferDisplayEntities(Main.getConfigurator().config.getBoolean("prefer-1-19-4-display-entities"));
 
         Logger.setMode(Level.WARNING);
         if (!broken) {
@@ -306,7 +307,7 @@ public class SBA extends PluginContainer implements AddonAPI {
     @Override
     public SBAPlayerWrapper getPlayerWrapper(Player player) {
         return PlayerWrapperService.getInstance().get(player)
-                .orElseGet(() -> PlayerMapper.wrapPlayer(player).as(SBAPlayerWrapper.class));
+                .orElseGet(() -> Players.wrapPlayer(player).as(SBAPlayerWrapper.class));
     }
 
     @Override
@@ -321,7 +322,7 @@ public class SBA extends PluginContainer implements AddonAPI {
 
     @Override
     public String getVersion() {
-        return getPluginDescription().getVersion();
+        return getPluginDescription().version();
     }
 
     @Override
