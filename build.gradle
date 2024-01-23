@@ -45,6 +45,9 @@ buildscript {
     dependencies {
         classpath "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin:5.0.0"
     }
+    dependencies {
+        classpath "io.freefair.gradle:lombok-plugin:8.4"
+    }
 }
 
 ext {
@@ -76,6 +79,7 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: "io.freefair.lombok"
     apply plugin: 'org.screamingsandals.plugin-builder'
     
     //apply plugin: 'org.screamingsandals.gradle.builder'
