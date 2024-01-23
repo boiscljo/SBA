@@ -1,54 +1,12 @@
-defaultTasks 'clean', 'screamCompile'
-
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven {
-            url = 'https://repo.screamingsandals.org/public'
-        }
-        maven {
-            url = uri('https://repo.dmulloy2.net/nexus/repository/public/')
-        }
-        maven {
-            url = uri('https://repo.dmulloy2.net/nexus/repository/public/')
-        }
-        maven {
-            url = uri('https://repo.screamingsandals.org/public')
-        }
-        maven {
-            url = uri('https://repo.screamingsandals.org/releases')
-        }
-        maven {
-            url = uri('https://repo.extendedclip.com/content/repositories/placeholderapi/')
-        }
-        maven {
-            url = uri('https://papermc.io/repo/repository/maven-public/')
-        }
-        maven {
-            url = uri('https://repo.maven.apache.org/maven2/')
-        }
-        maven {
-            url = uri('https://repo.screamingsandals.org/snapshots')
-        }
-        maven {
-            url = uri("https://plugins.gradle.org/m2/")
-        }
-      maven { url 'https://libraries.minecraft.net/' }
-    }
-    dependencies {
-        classpath 'org.screamingsandals.gradle:builder:' + SCREAMING_PLUGIN_BUILDER_VERSION
-    }
-    dependencies {
-        classpath "com.github.gmazzo:gradle-buildconfig-plugin:${BUILDCONFIG_VERSION}"
-    }
-    dependencies {
-        classpath "org.ajoberstar.grgit:org.ajoberstar.grgit.gradle.plugin:5.0.0"
-    }
-    dependencies {
-        classpath "io.freefair.gradle:lombok-plugin:8.4"
-    }
+plugins {
+    id 'org.screamingsandals.plugin-slib' version "${SCREAMING_PLUGIN_BUILDER_VERSION}" apply false
+    id 'com.github.gmazzo.buildconfig' version "${BUILDCONFIG_VERSION}" apply false
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
+    id 'org.ajoberstar.grgit' version '5.0.0' apply false
+    id 'io.freefair.lombok' version '8.4' apply false
 }
+
+defaultTasks 'clean', 'screamCompile'
 
 ext {
     try{
@@ -79,12 +37,38 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: "io.freefair.lombok"
-    apply plugin: 'org.screamingsandals.plugin-builder'
-    
-    //apply plugin: 'org.screamingsandals.gradle.builder'
+    apply plugin: 'io.freefair.lombok'
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'maven-publish'
 
-    enableShadowPlugin()
+    publishing.publications.create("maven", MavenPublication) {
+        artifact(tasks.shadowJar)
+
+        artifacts.every {
+            it.classifier = ""
+        }
+
+        pom.withXml {
+            def dependenciesNode = asNode().appendNode("dependencies")
+            project.configurations.compileOnly.dependencies.each {
+                if (!(it instanceof SelfResolvingDependency)) {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                    dependencyNode.appendNode('scope', 'provided')
+                }
+            }
+        }
+    }
+
+    tasks.register('screamCompile') {
+        if (System.getenv("OPTIMIZE_FOR_CI_CD") != "1") {
+            dependsOn("shadowJar", "publishToMavenLocal")
+        } else {
+            dependsOn('shadowJar') // publications are not used in this repo
+        }
+    }
 
     configurations.all {
         // Check for updates every build
@@ -124,9 +108,8 @@ subprojects {
     }
 
     dependencies {
-        //compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
-        //compileOnly 'org.spigotmc:spigot-api:1.9.4-R0.1-SNAPSHOT'
-        compileOnly paperLegacy(PAPER_LEGACY_VERSION)
+        compileOnly 'org.jetbrains:annotations:23.0.0'
+        compileOnly 'com.destroystokyo.paper:paper-api:' + PAPER_LEGACY_VERSION + '-R0.1-SNAPSHOT'
         compileOnly 'org.screamingsandals.bedwars:BedWars:' + BEDWARS_VERSION
         compileOnly 'org.screamingsandals.bedwars:BedWars-API:' + BEDWARS_VERSION
     }
@@ -177,7 +160,9 @@ subprojects {
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
     }
-    sourceCompatibility = '11.0'
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+    }
 }
 
 

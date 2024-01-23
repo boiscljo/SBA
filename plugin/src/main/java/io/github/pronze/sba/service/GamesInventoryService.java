@@ -29,6 +29,7 @@ import org.screamingsandals.lib.utils.annotations.Service;
 import org.screamingsandals.lib.utils.annotations.ServiceDependencies;
 import org.screamingsandals.lib.utils.annotations.methods.OnPostEnable;
 import org.screamingsandals.lib.utils.annotations.methods.OnPreDisable;
+import org.screamingsandals.lib.utils.annotations.parameters.DataFolder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,13 +64,18 @@ public class GamesInventoryService implements Listener {
     public static GamesInventoryService getInstance() {
         return ServiceManager.get(GamesInventoryService.class);
     }
+    private final File dataFolder;
+
+    public GamesInventoryService(@DataFolder("games-inventory") File dataFolder) {
+        this.dataFolder = dataFolder;
+    }
 
     @SneakyThrows
     @OnPostEnable
     public void loadGamesInv() {
                 if(SBA.isBroken())return;
                 SBA.getInstance().registerListener(this);
-        final var file = new File(SBA.getInstance().getDataFolder().resolve("games-inventory").toString(), "npc.yml");
+        final var file = new File(dataFolder, "npc.yml");
         if (file.exists()) {
             YamlConfiguration config = new YamlConfiguration();
             config.load(file);
@@ -203,8 +209,7 @@ public class GamesInventoryService implements Listener {
 
     public void update() {
         try {
-            final var file = new File(SBA.getInstance().getDataFolder().resolve("games-inventory").toString(),
-                    "npc.yml");
+            final var file = new File(dataFolder, "npc.yml");
             YamlConfiguration config = new YamlConfiguration();
 
             if (!file.exists()) {
