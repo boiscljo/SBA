@@ -42,5 +42,6 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "LICENSE,plugin/build/libs*.jar"
+          tag: ${{ steps.read_property.outputs.value }}.${{ steps.vars.outputs.sha_short }}
           allowUpdates: true
           prerelease: true
