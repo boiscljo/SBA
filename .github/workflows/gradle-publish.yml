@@ -28,8 +28,8 @@ jobs:
         id: vars
         shell: bash
         run: |
-            echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-            echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+            echo "{branch}=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_STATE
+            echo "{sha_short}=$(git rev-parse --short HEAD)" >> $GITHUB_STATE
       - name: Build with Gradle
         run: ./gradlew
         env:

@@ -38,6 +38,6 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "LICENSE,plugin/build/libs/*.jar"
-          tag: ${{ steps.read_property.outputs.value }}
+          tag: ${{ steps.read_property.outputs.value }}-dev
           allowUpdates: true
           prerelease: true
