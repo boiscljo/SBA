@@ -2,7 +2,7 @@ name: Latest semi stable SBA
 
 on:
   push:
-    branches: [ v1 ]
+    branches: [ release ]
 concurrency: sba_v1
 jobs:
   build:
