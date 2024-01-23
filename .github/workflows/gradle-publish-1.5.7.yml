@@ -26,22 +26,18 @@ jobs:
         id: vars
         shell: bash
         run: |
-            echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-            echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+            echo "{branch}=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_STATE
+            echo "{sha_short}=$(git rev-parse --short HEAD)" >> $GITHUB_STATE
       - name: Build with Gradle
         run: ./gradlew
         env:
           OPTIMIZE_FOR_CI_CD: "1"
-          BUILD_NUMBER: ${{ steps.calculated_build_number.outputs.build_n }}
+          BUILD_NUMBER: ${{ github.run_id }}
           GITHUB_ACTIONS_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           GITHUB_COMMIT_MESSAGE: "${{ github.event.head_commit.message }}"
-      - name: Upload the final artifact
-        uses: actions/upload-artifact@v4
-        with:
-          path: plugin/build/libs/SBA-${{ steps.read_property.outputs.value }}-all.jar
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "LICENSE,plugin/build/libs*.jar"
-          tag: ${{ steps.read_property.outputs.value }}.${{ steps.vars.outputs.sha_short }}
+          artifacts: "LICENSE,plugin/build/libs/*.jar"
+          tag: ${{ steps.read_property.outputs.value }}
           allowUpdates: true
           prerelease: true
