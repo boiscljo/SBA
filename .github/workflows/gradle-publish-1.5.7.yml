@@ -39,12 +39,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: plugin/build/libs/SBA-${{ steps.read_property.outputs.value }}-all.jar
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - uses: ncipollo/release-action@v1
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          artifacts: "LICENSE,plugin/build/libs*.jar"
+          allowUpdates: true
           prerelease: true
-          title: "Release Build ${{ steps.read_property.outputs.value }}"
-          files: |
-            LICENSE.txt
-            *.jar

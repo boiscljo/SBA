@@ -48,8 +48,8 @@ jobs:
           prerelease: false
           title: "Release Build ${{ steps.read_property.outputs.value }}"
           files: |
-            LICENSE.txt
-            *.jar
+            LICENSE
+            plugin/build/libs/*.jar
 
       # - name: Upload Release Asset
       #   id: upload-release-asset 
