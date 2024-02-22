@@ -59,12 +59,14 @@ import org.screamingsandals.lib.hologram.HologramManager;
 import org.screamingsandals.lib.npc.NPCManager;
 import org.screamingsandals.lib.packet.PacketMapper;
 import org.screamingsandals.lib.player.Players;
-import org.screamingsandals.lib.plugin.PluginContainer;
 import org.screamingsandals.lib.sidebar.SidebarManager;
 import org.screamingsandals.lib.utils.PlatformType;
 import org.screamingsandals.lib.utils.annotations.Init;
 import org.screamingsandals.lib.utils.annotations.Plugin;
 import org.screamingsandals.lib.utils.annotations.PluginDependencies;
+import org.screamingsandals.lib.utils.annotations.methods.OnDisable;
+import org.screamingsandals.lib.utils.annotations.methods.OnEnable;
+import org.screamingsandals.lib.utils.annotations.methods.OnPostEnable;
 import org.screamingsandals.simpleinventories.SimpleInventoriesCore;
 import io.github.pronze.lib.pronzelib.scoreboards.ScoreboardManager;
 
@@ -121,7 +123,7 @@ import static io.github.pronze.sba.utils.MessageUtils.showErrorMessage;
         AntiCheatIntegration.class,
         QuickBuyConfig.class
 })
-public class SBA extends PluginContainer implements AddonAPI {
+public class SBA implements AddonAPI {
 
     private static SBA instance;
     public static boolean sbw_0_2_30;
@@ -133,23 +135,25 @@ public class SBA extends PluginContainer implements AddonAPI {
     }
 
     private JavaPlugin cachedPluginInstance;
+    private org.screamingsandals.lib.plugin.Plugin pluginDescription;
     private final List<Listener> registeredListeners = new ArrayList<>();
     private Metrics metrics;
+
+    public SBA(JavaPlugin cachedPluginInstance, org.screamingsandals.lib.plugin.Plugin pluginDescription) {
+        this.cachedPluginInstance = cachedPluginInstance;
+        this.pluginDescription = pluginDescription;
+    }
 
     public static JavaPlugin getPluginInstance() {
         if (instance == null) {
             throw new UnsupportedOperationException("SBA has not yet been initialized!");
         }
-        if (instance.cachedPluginInstance == null) {
-            instance.cachedPluginInstance = (JavaPlugin) instance.getPluginDescription().as(JavaPlugin.class);
-        }
         return instance.cachedPluginInstance;
     }
 
-    @Override
+    @OnEnable
     public void enable() {
         instance = this;
-        cachedPluginInstance = instance.getPluginDescription().as(JavaPlugin.class);
         Logger.init(cachedPluginInstance);
 
         if (Main.getVersionNumber() < 109) {
@@ -179,7 +183,7 @@ public class SBA extends PluginContainer implements AddonAPI {
         metrics = new Metrics(cachedPluginInstance, pluginId);
     }
 
-    @Override
+    @OnPostEnable
     public void postEnable() {
 
         if (Bukkit.getServer().getServicesManager().getRegistration(BedwarsAPI.class) == null) {
@@ -292,7 +296,7 @@ public class SBA extends PluginContainer implements AddonAPI {
         }
     }
 
-    @Override
+    @OnDisable
     public void disable() {
         EventManager.getDefaultEventManager().unregisterAll();
         EventManager.getDefaultEventManager().destroy();
@@ -322,7 +326,7 @@ public class SBA extends PluginContainer implements AddonAPI {
 
     @Override
     public String getVersion() {
-        return getPluginDescription().version();
+        return pluginDescription.version();
     }
 
     @Override
@@ -357,7 +361,7 @@ public class SBA extends PluginContainer implements AddonAPI {
 
     @Override
     public JavaPlugin getJavaPlugin() {
-        return instance.getPluginDescription().as(JavaPlugin.class);
+        return instance.cachedPluginInstance;
     }
 
     public static org.bukkit.plugin.Plugin getBedwarsPlugin() {

@@ -1,4 +1,5 @@
 apply plugin: 'com.github.gmazzo.buildconfig'
+apply plugin: 'org.screamingsandals.plugin-slib'
 
 buildConfig {
     className('VersionInfo')
@@ -7,14 +8,29 @@ buildConfig {
     buildConfigField('String', 'COMMIT', "\"${revision}\"")
 }
 
-ScreamingLibBuilder()
-        .platforms('bukkit')
-        .modules('core', 'hologram', 'healthindicator', 'npc', 'sidebar', 'packets', 'cloud')
-        .universalModules('lang')
-        .version(SCREAMINGLIB_VERSION)
-        .simpleInventories(SIMPLEINVENTORIES_VERSION)
-        .enableAnnotationProcessor()
-        .build()
+slib {
+    version(SCREAMINGLIB_VERSION)
+
+    platforms('bukkit')
+
+    // We provide bukkit impl (paper-api) and develop against it, no need to provide incomplete stubs (TODO: remove this line when dependency detection is added to plugin-slib)
+    it.disableCompilerTricks = true
+
+    additionalContent {
+        module('hologram')
+        module('healthindicator')
+        module('npc')
+        module('sidebar')
+        module('packets')
+        module('cloud')
+
+        lang()
+
+        simpleInventories {
+            version(SIMPLEINVENTORIES_VERSION)
+        }
+    }
+}
 
 dependencies {
     compileOnly 'me.clip:placeholderapi:' + PAPI_VERSION
