@@ -730,7 +730,14 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 .getBoolean(false))
                         .inventoryType(SBAConfig.getInstance().node("shop", "inventory-type")
                                 .getString("CHEST"))
-                        .prefix(LanguageService.getInstance().get(MessageKeys.SHOP_NAME).toComponent()));
+                        .prefix(LanguageService.getInstance().get(MessageKeys.SHOP_NAME).toComponent()))
+                .allowAccessToConsole(Main.getConfigurator().config.getBoolean("shop.allow-execution-of-console-commands", true))
+
+                 // old shop format compatibility (SIv1, SBW 0.2.x)
+                 .variableToProperty("upgrade", "upgrade")
+                 .variableToProperty("generate-lore", "generateLore")
+                 .variableToProperty("generated-lore-text", "generatedLoreText")
+                 .variableToProperty("currency-changer", "currencyChanger");
     }
 
     @EventHandler

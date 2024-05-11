@@ -239,21 +239,30 @@ public abstract class AbstractStoreInventory implements IStoreInventory, Listene
         var currencyChanger = itemInfo.getFirstPropertyByName("currencyChanger");
         if (currencyChanger.isPresent()) {
             var changeItemToName = currencyChanger.get().getPropertyData().getString();
-            ItemSpawnerType changeItemType;
             if (changeItemToName == null) {
                 return;
             }
-
-            changeItemType = Main.getSpawnerType(changeItemToName.toLowerCase());
+            String[] split = changeItemToName.trim().split(" ", 2);
+            if (split.length == 2) {
+                try {
+                    amount = Integer.parseInt(split[0]);
+                    changeItemToName = split[1].trim();
+                    if (changeItemToName.startsWith("of ")) {
+                        changeItemToName = changeItemToName.substring(3).trim();
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            ItemSpawnerType changeItemType = Main.getSpawnerType(changeItemToName);
             if (changeItemType == null) {
                 return;
             }
 
-            newItem = changeItemType.getStack();
+            newItem = changeItemType.getStack(amount);
         }
 
         var originalMaxStackSize = newItem.getType().getMaxStackSize();
-        if (clickType.isShiftClick() && originalMaxStackSize > 1) {
+        if (!event.isHasAnyExecutions() && clickType.isShiftClick() && originalMaxStackSize > 1) {
             double priceOfOne = (double) priceAmount / amount;
             double maxStackSize;
             int finalStackSize;
@@ -292,37 +301,46 @@ public abstract class AbstractStoreInventory implements IStoreInventory, Listene
             return;
         }
 
-        for (var property : itemInfo.getProperties()) {
-            if (property.hasName()) {
-                var converted = ConfigurateUtils.raw(property.getPropertyData());
-                if (!(converted instanceof Map)) {
-                    converted = ShopUtil.nullValuesAllowingMap("value", converted);
-                }
-                // noinspection unchecked
-                var propertyData = (Map<String, Object>) converted;
-
-                // temporary fix
-                propertyData.putIfAbsent("name", property.getPropertyName());
-
-                var applyEvent = new BedwarsApplyPropertyToBoughtItem(game, player, newItem, propertyData);
-                Logger.trace("Calling event: {} for property: {}", applyEvent.getClass().getSimpleName(),
-                        property.getPropertyName());
-                SBA.getPluginInstance().getServer().getPluginManager().callEvent(applyEvent);
-                newItem = applyEvent.getStack();
-            }
-        }
-
-        AtomicReference<ItemStack> newItemRef = new AtomicReference<ItemStack>(newItem);
-        AtomicReference<org.screamingsandals.lib.item.ItemStack> newMaterialItemRef = new AtomicReference<>(materialItem);
+        final boolean shouldSellStack;
+        final boolean shouldBuyStack;
         AtomicReference<String[]> messageOnFail = new AtomicReference<>(MessageKeys.CANNOT_BUY);
-        final var result = handlePurchase(player, newItemRef, newMaterialItemRef, itemInfo, type,messageOnFail);
 
-        attemptLoreRemoval(newItem);
+        if (event.isHasAnyExecutions()) {
+            event.setRunExecutions(true); // SIv2 will handle that when this is set to true
+            shouldSellStack = true;
+            shouldBuyStack = false;
+        } else {
+            for (var property : itemInfo.getProperties()) {
+                if (property.hasName()) {
+                    var converted = ConfigurateUtils.raw(property.getPropertyData());
+                    if (!(converted instanceof Map)) {
+                        converted = ShopUtil.nullValuesAllowingMap("value", converted);
+                    }
+                    // noinspection unchecked
+                    var propertyData = (Map<String, Object>) converted;
 
-        newItem = newItemRef.get();
-        materialItem = newMaterialItemRef.get();
-        final var shouldSellStack = result.getKey();
-        final var shouldBuyStack = result.getValue();
+                    // temporary fix
+                    propertyData.putIfAbsent("name", property.getPropertyName());
+
+                    var applyEvent = new BedwarsApplyPropertyToBoughtItem(game, player, newItem, propertyData);
+                    Logger.trace("Calling event: {} for property: {}", applyEvent.getClass().getSimpleName(),
+                            property.getPropertyName());
+                    SBA.getPluginInstance().getServer().getPluginManager().callEvent(applyEvent);
+                    newItem = applyEvent.getStack();
+                }
+            }
+
+            AtomicReference<ItemStack> newItemRef = new AtomicReference<ItemStack>(newItem);
+            AtomicReference<org.screamingsandals.lib.item.ItemStack> newMaterialItemRef = new AtomicReference<>(materialItem);
+            final var result = handlePurchase(player, newItemRef, newMaterialItemRef, itemInfo, type, messageOnFail);
+
+            attemptLoreRemoval(newItem);
+
+            newItem = newItemRef.get();
+            materialItem = newMaterialItemRef.get();
+            shouldSellStack = result.getKey();
+            shouldBuyStack = result.getValue();
+        }
 
         // purchase failed, player does not have enough resources to purchase
         if (!shouldBuyStack && !shouldSellStack) {
