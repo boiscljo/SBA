@@ -3,8 +3,8 @@ package io.github.pronze.sba.listener;
 import org.bukkit.entity.Player;
 import org.screamingsandals.bedwars.Main;
 import org.screamingsandals.lib.event.OnEvent;
-import org.screamingsandals.lib.impl.nms.accessors.ClientboundSetEquipmentPacketAccessor;
-import org.screamingsandals.lib.impl.nms.accessors.ClientboundUpdateMobEffectPacketAccessor;
+import org.screamingsandals.lib.impl.nms.accessors.network.protocol.game.ClientboundSetEquipmentPacketAccessor;
+import org.screamingsandals.lib.impl.nms.accessors.network.protocol.game.ClientboundUpdateMobEffectPacketAccessor;
 import org.screamingsandals.lib.packet.event.SPacketEvent;
 import org.screamingsandals.lib.utils.PacketMethod;
 import org.screamingsandals.lib.utils.annotations.Service;
@@ -23,8 +23,8 @@ public class PacketListener {
         final var player = event.getPlayer().as(Player.class);
         final var packet = event.getPacket();
 
-        if (ClientboundUpdateMobEffectPacketAccessor.getType().isInstance(packet)) {
-            final var entityId = (int) Reflect.getField(packet, ClientboundUpdateMobEffectPacketAccessor.getFieldEntityId());
+        if (ClientboundUpdateMobEffectPacketAccessor.TYPE.get().isInstance(packet)) {
+            final var entityId = (int) Reflect.getField(packet, ClientboundUpdateMobEffectPacketAccessor.FIELD_ENTITY_ID.get());
             final var playerGame = Main.getInstance().getGameOfPlayer(player);
             if (playerGame == null) {
                 return;
@@ -66,8 +66,8 @@ public class PacketListener {
         final var player = event.getPlayer().as(Player.class);
         final var packet = event.getPacket();
 
-        if (ClientboundSetEquipmentPacketAccessor.getType().isInstance(packet)) {
-            final var entityId = (int) Reflect.getField(packet, ClientboundSetEquipmentPacketAccessor.getFieldEntity());
+        if (ClientboundSetEquipmentPacketAccessor.TYPE.get().isInstance(packet)) {
+            final var entityId = (int) Reflect.getField(packet, ClientboundSetEquipmentPacketAccessor.FIELD_ENTITY.get());
 
             Player equipper = null;
             final var playerGame = Main.getInstance().getGameOfPlayer(player);
