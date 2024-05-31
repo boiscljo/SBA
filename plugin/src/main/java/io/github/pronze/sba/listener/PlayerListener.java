@@ -340,7 +340,11 @@ public class PlayerListener implements Listener {
                             .send(party.getMembers().stream().filter(member -> !wrappedPlayer.equals(member))
                                     .toArray(SBAPlayerWrapper[]::new));
                 });
-        SBA.getInstance().getPlayerWrapperService().unregister(player);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void afterPlayerLeave(PlayerQuitEvent event) {
+        SBA.getInstance().getPlayerWrapperService().unregister(event.getPlayer());
     }
 
     @EventHandler
