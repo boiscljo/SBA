@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.screamingsandals.lib.utils.annotations.Service;
-import io.github.pronze.sba.config.SBAConfig;
+import org.screamingsandals.lib.utils.annotations.methods.ServiceInitializer;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +25,7 @@ public class Logger {
         return instance != null;
     }
 
+    @ServiceInitializer
     public static void init(JavaPlugin plugin) {
         instance = new Logger();
         instance.level = Level.WARNING;
