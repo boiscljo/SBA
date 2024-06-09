@@ -154,7 +154,6 @@ public class SBA implements AddonAPI {
     @OnEnable
     public void enable() {
         instance = this;
-        Logger.init(cachedPluginInstance);
 
         if (Main.getVersionNumber() < 109) {
             //showErrorMessage("Minecraft server is running versions below 1.9.4, please upgrade!");
