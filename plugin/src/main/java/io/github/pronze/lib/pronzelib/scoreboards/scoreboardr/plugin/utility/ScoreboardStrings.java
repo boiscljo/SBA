@@ -4,6 +4,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import io.github.pronze.lib.pronzelib.scoreboards.scoreboardr.plugin.Session;
+import org.screamingsandals.lib.Server;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ScoreboardStrings {
     }
 
     public static String colors(String content) {
-        if (ServerVersion.minor() >= 16) {
+        if (Server.isVersion(1, 16)) {
             Matcher match = pattern.matcher(content);
             while (match.find()) {
                 String color = content.substring(match.start(), match.end());
@@ -53,7 +54,7 @@ public class ScoreboardStrings {
     }
 
     public static String placeholderColors(String content) {
-        if (content.contains("&#") && ServerVersion.minor() >= 16) {
+        if (content.contains("&#") && Server.isVersion(1, 16)) {
             Matcher match = placeholderPattern.matcher(content);
             while (match.find()) {
                 String color = content.substring(match.start(), match.end());
