@@ -154,7 +154,6 @@ public class SBA implements AddonAPI {
     @OnEnable
     public void enable() {
         instance = this;
-        Logger.init(cachedPluginInstance);
 
         if (Main.getVersionNumber() < 109) {
             //showErrorMessage("Minecraft server is running versions below 1.9.4, please upgrade!");
@@ -198,10 +197,11 @@ public class SBA implements AddonAPI {
                 Bukkit.getServer().getPluginManager().disablePlugin(getPluginInstance());
                 return;
             }
-            if (!List.of("0.2.20", "0.2.21", "0.2.22", "0.2.23", "0.2.24", "0.2.25", "0.2.26", "0.2.27", "0.2.27.1", "0.2.28", "0.2.29", "0.2.30").stream()
+            if (!List.of("0.2.20", "0.2.21", "0.2.22", "0.2.23", "0.2.24", "0.2.25", "0.2.26", "0.2.27", "0.2.27.1", "0.2.28", "0.2.29", "0.2.30",
+                            "0.2.31", "0.2.32", "0.2.32.1").stream()
                     .anyMatch(BedwarsAPI.getInstance().getPluginVersion()::equals)) {
                 Logger.warn(
-                        "SBA hasn't been tested on this version of Bedwars. If you encounter bugs, use version 0.2.20 to 0.2.30. ");
+                        "SBA hasn't been tested on this version of Bedwars. If you encounter bugs, use version 0.2.20 to 0.2.32.1. ");
             }
             sbw_0_2_30 = Integer.parseInt(BedwarsAPI.getInstance().getPluginVersion().split("[.-]")[2]) >= 30;
         }

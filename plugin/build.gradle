@@ -32,6 +32,14 @@ slib {
     }
 }
 
+jar {
+    manifest {
+        attributes([
+                'paperweight-mappings-namespace': 'mojang'
+        ])
+    }
+}
+
 dependencies {
     compileOnly 'me.clip:placeholderapi:' + PAPI_VERSION
     compileOnly 'me.frap.vulcan:VulcanAPI:1.0.0'
