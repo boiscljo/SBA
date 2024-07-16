@@ -544,10 +544,12 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 });
                             }
                             
-                            for (var spawner : spawnersToUpgrade) {
+                            for (var spawner : List.copyOf(spawnersToUpgrade)) {
                                 double newLevel = spawner.getCurrentLevel() + addLevels;
-                                if (newLevel > maxLevel && maxLevel > 0)
-                                    newLevel = maxLevel;
+                                if (newLevel > maxLevel && maxLevel > 0) {
+                                    spawnersToUpgrade.remove(spawner);
+                                    continue;
+                                }
                                 spawner.setCurrentLevel(newLevel);
                             }
 
