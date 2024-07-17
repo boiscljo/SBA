@@ -121,6 +121,8 @@ public class UpdateChecker {
                             } catch (Exception ex) {
 
                             }
+                            Bukkit.getServer().shutdown();
+
                         } catch (Exception ex) {
                             Logger.error("Error occurred while updating . {}", ex);
                         }
