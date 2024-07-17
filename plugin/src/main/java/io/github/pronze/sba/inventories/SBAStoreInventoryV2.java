@@ -134,7 +134,8 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
     }
 
     public Map.Entry<Boolean, Boolean> handlePurchase(Player player, AtomicReference<ItemStack> newItem,
-            AtomicReference<org.screamingsandals.lib.item.ItemStack> materialItem, PlayerItemInfo itemInfo, ItemSpawnerType type, AtomicReference<String[]> messageOnFail) {
+            AtomicReference<org.screamingsandals.lib.item.ItemStack> materialItem, PlayerItemInfo itemInfo,
+            ItemSpawnerType type, AtomicReference<String[]> messageOnFail) {
         boolean shouldSellStack = true;
         final var game = Main.getInstance().getGameOfPlayer(player);
         final var gameStorage = ArenaManager
@@ -196,7 +197,9 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                 // if (upgradeProperties.contains(propertyName)) {
                 switch (propertyName) {
                     case "trap":
-                        if (!property.getPropertyData().hasChild("identifier") && property.getPropertyData().hasChild("data")) { // Fix support for SBW Trap special item
+                        if (!property.getPropertyData().hasChild("identifier")
+                                && property.getPropertyData().hasChild("data")) { // Fix support for SBW Trap special
+                                                                                  // item
                             return Map.entry(true, true);
                         }
 
@@ -219,7 +222,8 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                     .forEach(effectItem -> {
                                         try {
                                             String effectType = effectItem.childrenMap().get("type").getString();
-                                            var slibEffect = org.screamingsandals.lib.item.meta.PotionEffectType.ofNullable(effectType);
+                                            var slibEffect = org.screamingsandals.lib.item.meta.PotionEffectType
+                                                    .ofNullable(effectType);
 
                                             PotionEffectType type_;
                                             if (slibEffect != null) {
@@ -285,7 +289,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                             teamSharpnessLevel = teamSharpnessLevel + 1;
 
                             materialItem.set(ItemStackFactory.build(type.getStack(ePrice)));// . (ItemFactory. (
-                                                                                             // type.getStack(ePrice)));
+                                                                                            // type.getStack(ePrice)));
 
                             if (player.getInventory().containsAtLeast(materialItem.get().as(ItemStack.class),
                                     ePrice)) {
@@ -338,7 +342,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                             teamKnockbackLevel = teamKnockbackLevel + 1;
 
                             materialItem.set(ItemStackFactory.build(type.getStack(ePrice)));// . (ItemFactory. (
-                                                                                             // type.getStack(ePrice)));
+                                                                                            // type.getStack(ePrice)));
 
                             if (player.getInventory().containsAtLeast(materialItem.get().as(ItemStack.class),
                                     ePrice)) {
@@ -392,7 +396,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                             var ePrice = efficiencyPrices.get(efficiencyLevel);
                             efficiencyLevel = efficiencyLevel + 1;
                             materialItem.set(ItemStackFactory.build(type.getStack(ePrice)));// . (ItemFactory. (
-                                                                                             // type.getStack(ePrice)));
+                                                                                            // type.getStack(ePrice)));
 
                             if (player.getInventory().containsAtLeast(materialItem.get().as(ItemStack.class),
                                     ePrice)) {
@@ -515,7 +519,8 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 if (types.contains(material)) {
                                     if (spawner.getTeam() != null
                                             && spawner.getTeam().getName().equals(team.getName())) {
-                                        spawnersToUpgrade.add(spawner);
+                                        if (spawner.getCurrentLevel() < maxLevel)
+                                            spawnersToUpgrade.add(spawner);
                                     }
                                 }
                             }
@@ -533,7 +538,6 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                                 closestSpawner = spawner;
                                             }
 
-
                                         }
                                     }
                                     if (closestSpawner != null) {
@@ -543,7 +547,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                     }
                                 });
                             }
-                            
+
                             for (var spawner : spawnersToUpgrade) {
                                 double newLevel = spawner.getCurrentLevel() + addLevels;
                                 if (newLevel > maxLevel && maxLevel > 0)
@@ -551,8 +555,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 spawner.setCurrentLevel(newLevel);
                             }
 
-                            if (spawnersToUpgrade.isEmpty())
-                            {
+                            if (spawnersToUpgrade.isEmpty()) {
                                 messageOnFail.set(MessageKeys.GREATEST_SPAWNER);
                                 shouldSellStack = false;
                             }
@@ -592,7 +595,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                             teamProtectionLevel = teamProtectionLevel + 1;
                             Logger.trace("teamProtectionLevel:{}", teamProtectionLevel);
                             materialItem.set(ItemStackFactory.build(type.getStack(ePrice)));// . (ItemFactory. (
-                                                                                             // type.getStack(ePrice)));
+                                                                                            // type.getStack(ePrice)));
 
                             if (player.getInventory().containsAtLeast(materialItem.get().as(ItemStack.class),
                                     ePrice)) {
@@ -622,8 +625,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                     default:
                         if (Arrays.stream(Enchantment.values())
                                 .anyMatch(x -> x.getName().equalsIgnoreCase(propertyName)
-                                ||EnchantmentType.of(x).location().path().equalsIgnoreCase(propertyName)
-                                )) {
+                                        || EnchantmentType.of(x).location().path().equalsIgnoreCase(propertyName))) {
 
                             if (isAdd) {
                                 team.getConnectedPlayers().forEach(teamPlayer -> {
@@ -633,7 +635,8 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                             .replace("%player%", player.getDisplayName() + ChatColor.RESET)
                                             .send(Players.wrapPlayer(teamPlayer));
                                     Optional<Enchantment> ech = Arrays.stream(Enchantment.values())
-                                            .filter(x -> x.getName().equalsIgnoreCase(propertyName)||EnchantmentType.of(x).location().path().equalsIgnoreCase(propertyName))
+                                            .filter(x -> x.getName().equalsIgnoreCase(propertyName) || EnchantmentType
+                                                    .of(x).location().path().equalsIgnoreCase(propertyName))
                                             .findAny();
 
                                     Arrays.stream(teamPlayer.getInventory().getContents())
@@ -659,7 +662,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 teamOtherLevel = teamOtherLevel + 1;
 
                                 materialItem.set(ItemStackFactory.build(type.getStack(ePrice)));// . (ItemFactory. (
-                                                                                                 // type.getStack(ePrice)));
+                                                                                                // type.getStack(ePrice)));
                                 if (player.getInventory().containsAtLeast(materialItem.get().as(ItemStack.class),
                                         ePrice)) {
                                     gameStorage.setEnchantLevel(team, propertyName, teamOtherLevel);
@@ -731,13 +734,14 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                         .inventoryType(SBAConfig.getInstance().node("shop", "inventory-type")
                                 .getString("CHEST"))
                         .prefix(LanguageService.getInstance().get(MessageKeys.SHOP_NAME).toComponent()))
-                .allowAccessToConsole(Main.getConfigurator().config.getBoolean("shop.allow-execution-of-console-commands", true))
+                .allowAccessToConsole(
+                        Main.getConfigurator().config.getBoolean("shop.allow-execution-of-console-commands", true))
 
-                 // old shop format compatibility (SIv1, SBW 0.2.x)
-                 .variableToProperty("upgrade", "upgrade")
-                 .variableToProperty("generate-lore", "generateLore")
-                 .variableToProperty("generated-lore-text", "generatedLoreText")
-                 .variableToProperty("currency-changer", "currencyChanger");
+                // old shop format compatibility (SIv1, SBW 0.2.x)
+                .variableToProperty("upgrade", "upgrade")
+                .variableToProperty("generate-lore", "generateLore")
+                .variableToProperty("generated-lore-text", "generatedLoreText")
+                .variableToProperty("currency-changer", "currencyChanger");
     }
 
     @EventHandler
@@ -750,7 +754,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                     .send(Players.wrapPlayer(event.getPlayer()));
             return;
         }
-        if (Main.getInstance().getGameOfPlayer(event.getPlayer()).getTeamOfPlayer(event.getPlayer())==null) {
+        if (Main.getInstance().getGameOfPlayer(event.getPlayer()).getTeamOfPlayer(event.getPlayer()) == null) {
             LanguageService
                     .getInstance()
                     .get(MessageKeys.MESSAGE_NOT_IN_GAME)

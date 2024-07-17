@@ -467,7 +467,16 @@ public class BedWarsListener implements Listener {
                             .collect(Collectors.toList()).toArray(new ItemStack[0]).clone());
         }
         if(!collidableValue.containsKey(player.getUniqueId()))
+        {
+            try{
             collidableValue.put(player.getUniqueId(), player.isCollidable());
+            }
+            catch(Throwable t)
+            {
+            collidableValue.put(player.getUniqueId(), false);
+
+            }
+        }
         Tasker.runDelayed(DefaultThreads.GLOBAL_THREAD, () -> {
 
             player.getInventory().clear();
