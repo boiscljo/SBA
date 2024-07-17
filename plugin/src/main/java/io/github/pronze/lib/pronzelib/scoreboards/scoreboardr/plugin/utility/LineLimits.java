@@ -1,4 +1,7 @@
 package io.github.pronze.lib.pronzelib.scoreboards.scoreboardr.plugin.utility;
+
+import org.screamingsandals.lib.Server;
+
 //https://github.com/RienBijl/Scoreboard-revision/blob/master/src/main/java/rien/bijl/Scoreboard/r/Plugin/Utility/LineLimits.java
 public class LineLimits {
 
@@ -10,9 +13,7 @@ public class LineLimits {
             return lineLimit;
         }
 
-        int minor = ServerVersion.minor();
-
-        if (minor >= 13) {
+        if (Server.isVersion(1, 13)) {
             lineLimit = 64;
         } else {
             lineLimit = 16;
