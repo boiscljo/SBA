@@ -260,18 +260,19 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                     case "sharpness":
                         if (isAdd) {
                             team.getConnectedPlayers().forEach(teamPlayer -> {
-                                LanguageService
-                                        .getInstance()
-                                        .get(MessageKeys.UGPRADE_TEAM_SHARPNESS)
-                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                        .send(Players.wrapPlayer(teamPlayer));
-
                                 Arrays.stream(teamPlayer.getInventory().getContents())
                                         .filter(Objects::nonNull)
                                         .forEach(item -> {
                                             ShopUtil.increaseTeamEnchant(teamPlayer, item, Enchantment.DAMAGE_ALL,
                                                     levelToAddInt);
                                         });
+
+                                LanguageService
+                                        .getInstance()
+                                        .get(MessageKeys.UGPRADE_TEAM_SHARPNESS)
+                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                        .replace("%level%", String.valueOf(gameStorage.getSharpnessLevel(team).orElseThrow()))
+                                        .send(Players.wrapPlayer(teamPlayer));
                             });
                             break;
                         }
@@ -296,17 +297,19 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 gameStorage.setSharpnessLevel(team, teamSharpnessLevel);
                                 Integer finalTeamSharpnessLevel = teamSharpnessLevel;
                                 team.getConnectedPlayers().forEach(teamPlayer -> {
-                                    LanguageService
-                                            .getInstance()
-                                            .get(MessageKeys.UGPRADE_TEAM_SHARPNESS)
-                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                            .send(Players.wrapPlayer(teamPlayer));
-
                                     Arrays.stream(teamPlayer.getInventory().getContents())
                                             .filter(Objects::nonNull)
                                             .forEach(item -> {
                                                 ShopUtil.applyTeamEnchants(teamPlayer, item);
                                             });
+
+                                    LanguageService
+                                            .getInstance()
+                                            .get(MessageKeys.UGPRADE_TEAM_SHARPNESS)
+                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                            .replace("%level%", String.valueOf(gameStorage.getSharpnessLevel(team).orElseThrow()))
+                                            .send(Players.wrapPlayer(teamPlayer));
+
                                 });
                             } else
                                 shouldSellStack = false;
@@ -315,22 +318,23 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                     case "knockback":
                         if (isAdd) {
                             team.getConnectedPlayers().forEach(teamPlayer -> {
-                                LanguageService
-                                        .getInstance()
-                                        .get(MessageKeys.UPGRADE_TEAM_KNOCKBACK)
-                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                        .send(Players.wrapPlayer(teamPlayer));
-
                                 Arrays.stream(teamPlayer.getInventory().getContents())
                                         .filter(Objects::nonNull)
                                         .forEach(item -> {
                                             ShopUtil.increaseTeamEnchant(teamPlayer, item, Enchantment.KNOCKBACK,
                                                     levelToAddInt);
                                         });
+
+                                LanguageService
+                                        .getInstance()
+                                        .get(MessageKeys.UPGRADE_TEAM_KNOCKBACK)
+                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                        .replace("%level%", String.valueOf(gameStorage.getKnockbackLevel(team).orElseThrow()))
+                                        .send(Players.wrapPlayer(teamPlayer));
                             });
                             break;
                         }
-                        var teamKnockbackLevel = gameStorage.getSharpnessLevel(team).orElseThrow();
+                        var teamKnockbackLevel = gameStorage.getKnockbackLevel(team).orElseThrow();
                         var maxKnockbackLevel = SBAConfig.getInstance().node("upgrades", "limit", "Knockback")
                                 .getInt(1);
 
@@ -349,17 +353,19 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 gameStorage.setSharpnessLevel(team, teamKnockbackLevel);
                                 Integer finalTeamSharpnessLevel = teamKnockbackLevel;
                                 team.getConnectedPlayers().forEach(teamPlayer -> {
-                                    LanguageService
-                                            .getInstance()
-                                            .get(MessageKeys.UPGRADE_TEAM_KNOCKBACK)
-                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                            .send(Players.wrapPlayer(teamPlayer));
-
                                     Arrays.stream(teamPlayer.getInventory().getContents())
                                             .filter(Objects::nonNull)
                                             .forEach(item -> {
                                                 ShopUtil.applyTeamEnchants(teamPlayer, item);
                                             });
+
+                                    LanguageService
+                                            .getInstance()
+                                            .get(MessageKeys.UPGRADE_TEAM_KNOCKBACK)
+                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                            .replace("%level%", String.valueOf(gameStorage.getKnockbackLevel(team).orElseThrow()))
+                                            .send(Players.wrapPlayer(teamPlayer));
+
                                 });
                             } else
                                 shouldSellStack = false;
@@ -369,11 +375,6 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                     case "efficiency":
                         if (isAdd) {
                             team.getConnectedPlayers().forEach(teamPlayer -> {
-                                LanguageService
-                                        .getInstance()
-                                        .get(MessageKeys.UPGRADE_TEAM_EFFICIENCY)
-                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                        .send(Players.wrapPlayer(teamPlayer));
                                 Logger.trace("efficiency level add");
                                 Arrays.stream(teamPlayer.getInventory().getContents())
                                         .filter(Objects::nonNull)
@@ -381,6 +382,12 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                             ShopUtil.increaseTeamEnchant(teamPlayer, item, Enchantment.DIG_SPEED,
                                                     levelToAddInt);
                                         });
+                                LanguageService
+                                        .getInstance()
+                                        .get(MessageKeys.UPGRADE_TEAM_EFFICIENCY)
+                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                        .replace("%level%", String.valueOf(gameStorage.getEfficiencyLevel(team).orElseThrow()))
+                                        .send(Players.wrapPlayer(teamPlayer));
                             });
                             break;
                         }
@@ -403,17 +410,17 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                 gameStorage.setEfficiencyLevel(team, efficiencyLevel);
                                 Logger.trace("efficiency {}", efficiencyLevel);
                                 team.getConnectedPlayers().forEach(teamPlayer -> {
-                                    LanguageService
-                                            .getInstance()
-                                            .get(MessageKeys.UPGRADE_TEAM_EFFICIENCY)
-                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                            .send(Players.wrapPlayer(teamPlayer));
-
                                     Arrays.stream(teamPlayer.getInventory().getContents())
                                             .filter(Objects::nonNull)
                                             .forEach(item -> {
                                                 ShopUtil.applyTeamEnchants(teamPlayer, item);
                                             });
+                                    LanguageService
+                                            .getInstance()
+                                            .get(MessageKeys.UPGRADE_TEAM_EFFICIENCY)
+                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                            .replace("%level%", String.valueOf(gameStorage.getEfficiencyLevel(team).orElseThrow()))
+                                            .send(Players.wrapPlayer(teamPlayer));
                                 });
                             } else
                                 shouldSellStack = false;
@@ -564,18 +571,18 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                     case "protection":
                         if (isAdd) {
                             team.getConnectedPlayers().forEach(teamPlayer -> {
-                                LanguageService
-                                        .getInstance()
-                                        .get(MessageKeys.UPGRADE_TEAM_PROTECTION)
-                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                        .send(Players.wrapPlayer(teamPlayer));
-
                                 Arrays.stream(teamPlayer.getInventory().getContents())
                                         .filter(Objects::nonNull)
                                         .forEach(item -> {
                                             ShopUtil.increaseTeamEnchant(teamPlayer, item,
                                                     Enchantment.PROTECTION_ENVIRONMENTAL, levelToAddInt);
                                         });
+                                LanguageService
+                                        .getInstance()
+                                        .get(MessageKeys.UPGRADE_TEAM_PROTECTION)
+                                        .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                        .replace("%level%", String.valueOf(gameStorage.getProtectionLevel(team).orElseThrow()))
+                                        .send(Players.wrapPlayer(teamPlayer));
                             });
                             break;
                         }
@@ -606,8 +613,8 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                         .getInstance()
                                         .get(MessageKeys.UPGRADE_TEAM_PROTECTION)
                                         .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                        .replace("%level%", String.valueOf(gameStorage.getProtectionLevel(team).orElseThrow()))
                                         .toComponent();
-
                                 team.getConnectedPlayers().forEach(teamPlayer -> {
                                     // ShopUtil.addEnchantsToPlayerArmor(teamPlayer, finalTeamProtectionLevel);
                                     Arrays.stream(teamPlayer.getInventory().getContents())
@@ -629,11 +636,6 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
 
                             if (isAdd) {
                                 team.getConnectedPlayers().forEach(teamPlayer -> {
-                                    LanguageService
-                                            .getInstance()
-                                            .get(MessageKeys.UPGRADE_TEAM_ENCHANT)
-                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                            .send(Players.wrapPlayer(teamPlayer));
                                     Optional<Enchantment> ech = Arrays.stream(Enchantment.values())
                                             .filter(x -> x.getName().equalsIgnoreCase(propertyName) || EnchantmentType
                                                     .of(x).location().path().equalsIgnoreCase(propertyName))
@@ -645,6 +647,12 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                                 ShopUtil.increaseTeamEnchant(teamPlayer, item, ech.get(),
                                                         levelToAddInt);
                                             });
+                                    LanguageService
+                                            .getInstance()
+                                            .get(MessageKeys.UPGRADE_TEAM_ENCHANT)
+                                            .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                            .replace("%level%", String.valueOf(gameStorage.getEnchantLevel(team, propertyName).orElseThrow()))
+                                            .send(Players.wrapPlayer(teamPlayer));
                                 });
                                 break;
                             }
@@ -667,17 +675,18 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                         ePrice)) {
                                     gameStorage.setEnchantLevel(team, propertyName, teamOtherLevel);
                                     team.getConnectedPlayers().forEach(teamPlayer -> {
-                                        LanguageService
-                                                .getInstance()
-                                                .get(MessageKeys.UPGRADE_TEAM_ENCHANT)
-                                                .replace("%player%", player.getDisplayName() + ChatColor.RESET)
-                                                .send(Players.wrapPlayer(teamPlayer));
-
                                         Arrays.stream(teamPlayer.getInventory().getContents())
                                                 .filter(Objects::nonNull)
                                                 .forEach(item -> {
                                                     ShopUtil.applyTeamEnchants(teamPlayer, item);
                                                 });
+                                        LanguageService
+                                                .getInstance()
+                                                .get(MessageKeys.UPGRADE_TEAM_ENCHANT)
+                                                .replace("%player%", player.getDisplayName() + ChatColor.RESET)
+                                                .replace("%level%", String.valueOf(gameStorage.getEnchantLevel(team, propertyName).orElseThrow()))
+                                                .send(Players.wrapPlayer(teamPlayer));
+
                                     });
                                 } else
                                     shouldSellStack = false;
