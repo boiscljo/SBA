@@ -66,7 +66,11 @@ public class InvisiblePlayerImpl implements InvisiblePlayer {
                             .setNameTagVisibility(NameTagVisibility.NEVER));
                 }
                 final var invisibleScoreboardTeam = holder.getTeamOrRegister(invisTeamName);
-                invisibleScoreboardTeam.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
+                try {
+                    invisibleScoreboardTeam.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
+                } catch (Throwable t) {
+                    // 1.8.8
+                }
                 holder.getTeamEntry(team.getName()).ifPresent(entry -> {
                     if (entry.hasEntry(hiddenPlayer.getName())) {
                         entry.removeEntry(hiddenPlayer.getName());
@@ -195,7 +199,11 @@ public class InvisiblePlayerImpl implements InvisiblePlayer {
                             .setNameTagVisibility(NameTagVisibility.NEVER));
                 }
                 final var invisibleScoreboardTeam = holder.getTeamOrRegister(invisTeamName);
-                invisibleScoreboardTeam.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
+                try {
+                    invisibleScoreboardTeam.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
+                } catch (Throwable t) {
+                    // 1.8.8
+                }
 
                 if (invisibleScoreboardTeam.hasEntry(hiddenPlayer.getName())) {
                     invisibleScoreboardTeam.removeEntry(hiddenPlayer.getName());

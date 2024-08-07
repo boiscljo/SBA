@@ -25,6 +25,7 @@ import io.github.pronze.sba.config.SBAConfig;
 import io.github.pronze.sba.SBA;
 import io.github.pronze.lib.pronzelib.scoreboards.Scoreboard;
 import io.github.pronze.lib.pronzelib.scoreboards.ScoreboardManager;
+import org.screamingsandals.lib.utils.reflect.Reflect;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -190,7 +191,11 @@ public class LobbyScoreboardManager implements Listener {
                     holder.addTeam(team.getName(), TeamColor.fromApiColor(team.getColor()).chatColor);
                 }
                 final var scoreboardTeam = holder.getTeamOrRegister(team.getName());
-                scoreboardTeam.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
+                try {
+                    scoreboardTeam.setOption(Option.COLLISION_RULE, OptionStatus.NEVER);
+                } catch (Throwable t) {
+                    // 1.8.8
+                }
                 
                 new HashSet<>(scoreboardTeam.getEntries())
                         .stream()
