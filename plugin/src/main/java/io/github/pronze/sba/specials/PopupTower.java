@@ -158,7 +158,7 @@ public class PopupTower {
         for (int i = 0; i < length; i++) {
             lastLoc = lastLoc.getBlock().getRelative(face).getLocation();
             final Block ladder = lastLoc.getBlock();
-            if (!isLocationSafe(lastLoc)) {
+            if (!isLocationSafe(lastLoc) || !game.isLocationInArena(lastLoc)) {
                 continue;
             }
             ladder.setType(Material.LADDER, false);
