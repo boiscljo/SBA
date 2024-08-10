@@ -19,6 +19,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 import org.screamingsandals.bedwars.Main;
+import org.screamingsandals.lib.impl.bukkit.utils.Version;
 import org.screamingsandals.lib.utils.annotations.Service;
 import org.screamingsandals.lib.utils.annotations.methods.OnPostEnable;
 
@@ -70,6 +71,13 @@ public class ExplosionVelocityControlListener implements Listener {
         // final var explodedEntity = event.getDamager();
 
         if (explodedEntity instanceof Explosive) {
+            if (Version.isVersion(1, 20, 3)) {
+                var entityKey = explodedEntity.getType().getKey();
+                if ("minecraft".equals(entityKey.getNamespace()) && ("wind_charge".equals(entityKey.getKey()) || "breeze_wind_charge".equals(entityKey.getKey()))) {
+                    return; // Ignore wind charges
+                }
+            }
+
             final var detectionDistance = SBAConfig.getInstance().node("tnt-fireball-jumping", "detection-distance")
                     .getDouble(5.0D);
 

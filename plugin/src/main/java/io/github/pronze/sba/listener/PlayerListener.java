@@ -17,6 +17,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -45,6 +46,7 @@ import org.screamingsandals.bedwars.api.BedwarsAPI;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.game.GamePlayer;
 import org.screamingsandals.lib.Server;
+import org.screamingsandals.lib.impl.bukkit.utils.Version;
 import org.screamingsandals.lib.player.Players;
 import org.screamingsandals.lib.utils.annotations.Service;
 import org.screamingsandals.lib.utils.annotations.methods.OnPostEnable;
@@ -385,16 +387,27 @@ public class PlayerListener implements Listener {
         if (item.getType() == Material.POTION) {
             final var potionMeta = (PotionMeta) item.getItemMeta();
             boolean isInvis = false;
-            if (potionMeta.getBasePotionData().getType() == PotionType.INVISIBILITY) {
-                isInvis = true;
-            } else {
-                if (potionMeta.hasCustomEffects()) {
-                    isInvis = potionMeta
-                            .getCustomEffects()
-                            .stream()
-                            .anyMatch(potionEffect -> potionEffect.getType().getName()
-                                    .equalsIgnoreCase(PotionEffectType.INVISIBILITY.getName()));
+            if (Version.isVersion(1, 20, 5)) {
+                var result = (NamespacedKey) Reflect.fastInvokeResulted(potionMeta, "getBasePotionType").fastInvoke("getKey");
+                if (result != null && ("invisibility".equals(result.getKey()) || "long_invisibility".equals(result.getKey()))) {
+                    isInvis = true;
                 }
+            } else if (Version.isVersion(1, 9)) {
+                if (potionMeta.getBasePotionData().getType() == PotionType.INVISIBILITY) {
+                    isInvis = true;
+                }
+            } else {
+                if (org.bukkit.potion.Potion.fromItemStack(item).getType() == PotionType.INVISIBILITY) {
+                    isInvis = true;
+                }
+            }
+
+            if (!isInvis && potionMeta.hasCustomEffects()) {
+                isInvis = potionMeta
+                        .getCustomEffects()
+                        .stream()
+                        .anyMatch(potionEffect -> potionEffect.getType().getName()
+                                .equalsIgnoreCase(PotionEffectType.INVISIBILITY.getName()));
             }
 
             if (isInvis) {
