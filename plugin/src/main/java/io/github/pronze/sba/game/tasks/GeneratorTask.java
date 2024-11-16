@@ -38,7 +38,7 @@ public class GeneratorTask extends BaseGameTask {
 
     @Override
     public void run() {
-        if (nextEvent != GameTierEvent.GAME_END) {
+        if (nextEvent != GameTierEvent.GAME_END && nextEvent != GameTierEvent.BED_DESTROYED) {
             if (elapsedTime == nextEvent.getTime()) {
                 if (timerUpgrades) {
                     try {
@@ -102,7 +102,16 @@ public class GeneratorTask extends BaseGameTask {
                 }
                 nextEvent = nextEvent.getNextEvent();
             }
+        } else if (nextEvent == GameTierEvent.BED_DESTROYED) {
+            if (elapsedTime == (int)Math.round(game.getGameTime()*0.8)) {
+                game.getRunningTeams().forEach(it -> {
+                    if (it.isTargetBlockExists()) {
+                        ((org.screamingsandals.bedwars.game.Game) game).targetBlockExplode(it);
+                    }
 
+                });
+                nextEvent = nextEvent.getNextEvent();
+            }
         }
         elapsedTime++;
     }
@@ -110,6 +119,8 @@ public class GeneratorTask extends BaseGameTask {
     public String getTimeLeftForNextEvent() {
         if (nextEvent == GameTierEvent.GAME_END) {
             return ((org.screamingsandals.bedwars.game.Game) game).getFormattedTimeLeft();
+        } else if (nextEvent == GameTierEvent.BED_DESTROYED) {
+            return ((org.screamingsandals.bedwars.game.Game) game).getFormattedTimeLeft(((int)Math.round(game.getGameTime()*0.8)) - elapsedTime);
         } else {
             return ((org.screamingsandals.bedwars.game.Game) game).getFormattedTimeLeft(nextEvent.getTime() - elapsedTime);
         }
@@ -121,6 +132,12 @@ public class GeneratorTask extends BaseGameTask {
                     .getInstance()
                     .get(MessageKeys.GAME_END_MESSAGE)
                     .toString();
+        } else if (nextEvent == GameTierEvent.BED_DESTROYED) {
+            return LanguageService
+                    .getInstance()
+                    .get(MessageKeys.BED_DESTROYED_TITLE)
+                    .toComponent()
+                    .toPlainText();
         } else {
             try {
                 var tierName = nextEvent.getKey();
