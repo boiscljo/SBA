@@ -42,6 +42,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.screamingsandals.bedwars.Main;
+import org.screamingsandals.bedwars.api.BedwarsAPI;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.game.GamePlayer;
 import org.screamingsandals.lib.Server;
@@ -278,8 +279,14 @@ public class PlayerListener implements Listener {
 
         final var ItemDrop = evt.getItemDrop().getItemStack();
         final var type = ItemDrop.getType();
+        final var locationY = evt.getItemDrop().getLocation().getY();
+        final var game = BedwarsAPI.getInstance().getGameOfPlayer(evt.getPlayer());
+        final var spawnerY = game.getItemSpawners().get(1).getLocation().getY();
 
         if (!allowedDropItems.contains(type) && !type.name().endsWith("WOOL")) {
+            evt.setCancelled(true);
+            player.getInventory().remove(ItemDrop);
+        } else if (locationY<=(spawnerY-8)) {
             evt.setCancelled(true);
             player.getInventory().remove(ItemDrop);
         }

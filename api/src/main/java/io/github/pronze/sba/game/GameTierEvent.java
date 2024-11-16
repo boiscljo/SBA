@@ -22,10 +22,12 @@ public class GameTierEvent {
      * EMERALD_GEN_UPGRADE_TIER_III("Emerald-III"),
      * DIAMOND_GEN_UPGRADE_TIER_IV("Diamond-IV"),
      * EMERALD_GEN_UPGRADE_TIER_V("Emerald-IV"),
+     * BED_DESTROYED("BedDestroyed"),
      * GAME_END("GameEnd");
      */
 
     public static final GameTierEvent GAME_END = new GameTierEvent("GameEnd");
+    public static final GameTierEvent BED_DESTROYED = new GameTierEvent("BedDestroyed");
     private static List<GameTierEvent> events = new ArrayList<>();
     private final String key;
 
@@ -43,6 +45,7 @@ public class GameTierEvent {
             }
         }
         events.sort(Comparator.comparing(e->((GameTierEvent)e).getTime()));
+        events.add(BED_DESTROYED);
         events.add(GAME_END);
     }
 
