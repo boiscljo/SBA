@@ -86,11 +86,11 @@ floating-generator:
   holo-text:
     - "<yellow>等级 <red>%tier%"
     - "%material%"
-    - "<yellow>将在 <red>%seconds% <yellow>秒内产出"
+    - "<yellow>将在 <red>%seconds% <yellow>秒内生成"
   full-text:
     - "<yellow>等级 <red>%tier%"
     - "%material%"
-    - "<red><bold>生成器已满！</bold></red>"
+    - "<red><bold>资源点已满！</bold></red>"
 lobby-scoreboard:
   solo-prefix: "单人"
   doubles-prefix: "双人"
@@ -130,8 +130,8 @@ game-start:
     - "                             <white><bold>Bed Wars</bold>"
     - ""
     - "    <yellow><bold>保护你的床并摧毁敌人的床。</bold>"
-    - "     <yellow><bold>从生成器中收集铁锭，金锭，绿宝石和钻石来升级，</bold>"
-    - "   <yellow><bold>使自身和队伍变得更强。</bold>"
+    - "     <yellow><bold>从资源点收集铁锭，金锭，绿宝石和钻石来升级，</bold>"
+    - "   <yellow><bold>使自己和队伍变得更强。</bold>"
     - ""
     - "<green>▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
     - ""
