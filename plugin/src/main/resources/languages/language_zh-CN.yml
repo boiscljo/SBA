@@ -404,7 +404,7 @@ shop:
   amount: "数量: "
   buy_success: "<green>你购买了: </green><yellow>%item%</yellow>"
   buy_failed: "<red>你没有足够的 %material%</red>"
-  max-enchant:<gray>.
+  max-enchant:
     - "最大附魔等级"
     - "你的队伍已经达到了最大附魔等级。"
 death-messages:
