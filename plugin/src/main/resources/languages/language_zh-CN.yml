@@ -394,7 +394,7 @@ shop:
       - "<aqua>物品商店"
       - "<yellow><bold>右键点击"
     upgrade-shop-display-name:
-      - "<aqua>升级上单"
+      - "<aqua>升级商店"
       - "<yellow><bold>右键点击"
   name: "[SBA] 商店"
   page_back: "上一页"
