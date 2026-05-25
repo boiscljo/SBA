@@ -58,6 +58,7 @@ import org.screamingsandals.lib.healthindicator.HealthIndicatorManager2;
 import org.screamingsandals.lib.hologram.HologramManager;
 import org.screamingsandals.lib.npc.NPCManager;
 import org.screamingsandals.lib.packet.PacketMapper;
+import org.screamingsandals.lib.placeholders.PlaceholderManager;
 import org.screamingsandals.lib.player.Players;
 import org.screamingsandals.lib.sidebar.SidebarManager;
 import org.screamingsandals.lib.utils.PlatformType;
@@ -121,7 +122,8 @@ import static io.github.pronze.sba.utils.MessageUtils.showErrorMessage;
         SpawnerProtectionListener.class,
         SidebarManager.class,
         AntiCheatIntegration.class,
-        QuickBuyConfig.class
+        QuickBuyConfig.class,
+        PlaceholderManager.class, // required by shop
 })
 public class SBA implements AddonAPI {
 

@@ -262,7 +262,12 @@ public abstract class AbstractStoreInventory implements IStoreInventory, Listene
         }
 
         var originalMaxStackSize = newItem.getType().getMaxStackSize();
-        if (!event.isHasAnyExecutions() && clickType.isShiftClick() && originalMaxStackSize > 1) {
+        if (
+            !event.isHasAnyExecutions()
+            && clickType.isShiftClick()
+            && originalMaxStackSize > 1
+            && !itemInfo.getFirstPropertyByName("disableShiftBuying").map(v -> v.getPropertyData().getBoolean(false)).orElse(false)
+        ) {
             double priceOfOne = (double) priceAmount / amount;
             double maxStackSize;
             int finalStackSize;
