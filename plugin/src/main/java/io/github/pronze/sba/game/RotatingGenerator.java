@@ -98,7 +98,10 @@ public class RotatingGenerator implements IRotatingGenerator {
                 // Logger.trace("RotatingGenerator::hologramTask ({},{})", this,hologramTask);
 
                 boolean full;
-                if (SBA.sbw_0_2_30) {
+                if (itemSpawner.getMaxSpawnedResources() <= 0) {
+                    // Unlimited spawner
+                    full = false;
+                } else if (SBA.sbw_0_2_30) {
                     // SBW changed the maxSpawnedResources logic and introduced getSpawnedItemsCount() method,
                     // we should use it here to prevent hologram synchronization issues
                     full = itemSpawner.getMaxSpawnedResources() <= itemSpawner.getSpawnedItemsCount();
