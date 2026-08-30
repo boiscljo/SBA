@@ -23,6 +23,7 @@ slib {
         module('sidebar')
         module('packets')
         module('cloud')
+        module('placeholders')
 
         lang()
 
