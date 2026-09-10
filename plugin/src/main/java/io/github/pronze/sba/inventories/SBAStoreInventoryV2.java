@@ -749,7 +749,8 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                 .variableToProperty("upgrade", "upgrade")
                 .variableToProperty("generate-lore", "generateLore")
                 .variableToProperty("generated-lore-text", "generatedLoreText")
-                .variableToProperty("currency-changer", "currencyChanger");
+                .variableToProperty("currency-changer", "currencyChanger")
+                .variableToProperty("disable-shift-buying", "disableShiftBuying");
     }
 
     @EventHandler

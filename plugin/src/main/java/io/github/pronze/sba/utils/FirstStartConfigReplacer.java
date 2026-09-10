@@ -118,6 +118,8 @@ public class FirstStartConfigReplacer {
         if (SBAConfig.getInstance().node("first_start").getBoolean(true)) {
             Bukkit.getLogger().info("§aDetected first start");
             updateBedWarsConfig();
+            // Force our shop.yml during the first start
+            SBAConfig.getInstance().saveShop("shop.yml", true);
             SBAConfig.getInstance().upgrade();
             try {
                 SBAConfig.getInstance().node("first_start").set(false);
