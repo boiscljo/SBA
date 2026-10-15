@@ -26,6 +26,8 @@ data:
       type: FURNACE
       amount: 1
       display-name: "Forge Upgrade"
+      lore:
+        - "§7Increase odds of an extra ingot from nearby iron & gold generators by 20%"
 
   - stack: "BEACON;1;§bHeal Pool;§7Triggers a pool around the base that heals you!"
     column: 5
